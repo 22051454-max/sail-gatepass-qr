@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h2>Gate scan log</h2><table><tr><th>Time (UTC)</th><th>Pass</th><th>Visitor</th><th>Action</th><th>Gate</th><th>Officer</th><th>Note</th></tr>
+{% for s in logs %}<tr><td>{{ s.scanned_at.strftime('%d %b %H:%M:%S') }}</td><td>{{ s.gate_pass.pass_no }}</td><td>{{ s.gate_pass.visitor_name }}</td>
+<td>{{ s.action }}</td><td>{{ s.gate }}</td><td>{{ s.scanned_by.username if s.scanned_by else '-' }}</td><td>{{ s.note }}</td></tr>
+{% else %}<tr><td colspan="7" class="muted">No scans yet</td></tr>{% endfor %}</table></div>
+{% endblock %}

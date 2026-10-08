@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><div class="passcard">
+<div><img src="{{ qr }}" alt="QR code for {{ gp.pass_no }}" width="220"><p class="muted" style="font-size:12px;max-width:220px;word-break:break-all">{{ gp.token }}</p></div>
+<div style="flex:1;min-width:260px"><h2>{{ gp.pass_no }} <span class="badge {{ gp.status }}">{{ gp.status }}</span></h2>
+<table><tr><th>Visitor</th><td>{{ gp.visitor_name }}</td></tr><tr><th>Company</th><td>{{ gp.company or '-' }}</td></tr>
+<tr><th>Purpose</th><td>{{ gp.purpose }}</td></tr><tr><th>Department</th><td>{{ gp.department }}</td></tr>
+<tr><th>Vehicle</th><td>{{ gp.vehicle_no or '-' }}</td></tr><tr><th>Gate</th><td>{{ gp.gate }}</td></tr>
+<tr><th>Valid until</th><td>{{ gp.valid_until.strftime('%d %b %Y %H:%M') }} UTC{% if gp.is_expired %} <b style="color:#c62828">expired</b>{% endif %}</td></tr>
+<tr><th>Issued by</th><td>{{ gp.created_by.full_name if gp.created_by else '-' }}</td></tr></table></div></div>
+{% if gp.materials %}<h3>Materials</h3><table><tr><th>Description</th><th>Qty</th><th>Direction</th><th>Returnable</th><th>Verified at gate</th></tr>
+{% for m in gp.materials %}<tr><td>{{ m.description }}</td><td>{{ m.quantity|round(2) }} {{ m.unit }}</td><td>{{ m.direction }}</td><td>{{ 'Yes' if m.returnable else 'No' }}</td><td>{{ 'Yes' if m.verified else 'Pending' }}</td></tr>{% endfor %}</table>{% endif %}
+{% if gp.scans %}<h3>Scan history</h3><table>{% for s in gp.scans %}<tr><td>{{ s.scanned_at.strftime('%d %b %H:%M') }}</td><td>{{ s.action }}</td><td>{{ s.gate }}</td><td>{{ s.note }}</td></tr>{% endfor %}</table>{% endif %}
+<p class="noprint"><button class="btn secondary" onclick="window.print()">Print pass</button>
+{% if g.user.role=='admin' and gp.status!='revoked' %}<form method="post" action="{{ url_for('admin.revoke', pass_no=gp.pass_no) }}" style="display:inline"><button class="btn danger">Revoke</button></form>{% endif %}</p></div>
+{% endblock %}

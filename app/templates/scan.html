@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% block content %}
+<div class="grid">
+<div class="card"><h2>Scan QR at gate</h2>
+<label>Gate</label><select id="gate"><option>Main Gate</option><option>Gate 2 (Material)</option><option>Gate 3</option></select>
+<div id="reader" style="width:100%;margin-top:12px"></div>
+<label>Or paste / type pass token</label><input id="token" placeholder="token from QR">
+<p><button class="btn" onclick="verify(document.getElementById('token').value)">Verify</button></p></div>
+<div class="card"><h2>Result</h2><div id="result" class="muted">Waiting for scan…</div><div id="details"></div></div></div>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+let busy=false;
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function verify(token){if(!token||busy)return;busy=true;
+ const r=await fetch('{{ url_for("passes.verify") }}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,gate:document.getElementById('gate').value})});
+ const d=await r.json();const res=document.getElementById('result');res.className='result '+(d.ok?'ok':'bad');
+ res.textContent=(d.ok?'✔ ':'✖ ')+d.message+(d.action?' ('+d.action+')':'');
+ let h='';if(d.pass){const p=d.pass;h=`<table><tr><th>Pass</th><td>${esc(p.pass_no)}</td></tr><tr><th>Visitor</th><td>${esc(p.visitor_name)}</td></tr>
+ <tr><th>Company</th><td>${esc(p.company)}</td></tr><tr><th>Dept</th><td>${esc(p.department)}</td></tr><tr><th>Vehicle</th><td>${esc(p.vehicle_no||'-')}</td></tr></table>`;
+ if(p.materials.length){h+='<h3>Materials to check</h3><table>'+p.materials.map(m=>`<tr><td>${esc(m.description)}</td><td>${m.quantity} ${esc(m.unit)} ${esc(m.direction)}</td>
+ <td>${m.verified?'✔ verified':`<button class="btn secondary" onclick="vm(${m.id},this)">Mark verified</button>`}</td></tr>`).join('')+'</table>';}}
+ document.getElementById('details').innerHTML=h;setTimeout(()=>busy=false,2500);}
+async function vm(id,btn){await fetch('/api/materials/'+id+'/verify',{method:'POST'});btn.outerHTML='✔ verified';}
+if(window.Html5QrcodeScanner){new Html5QrcodeScanner('reader',{fps:10,qrbox:220},false).render(t=>verify(t),()=>{});}
+</script>
+{% endblock %}

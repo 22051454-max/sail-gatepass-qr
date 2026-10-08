@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block content %}
+<div class="grid">
+<div class="card"><div class="muted">Passes issued today</div><div class="stat">{{ stats.today }}</div></div>
+<div class="card"><div class="muted">Visitors inside</div><div class="stat">{{ stats.inside }}</div></div>
+<div class="card"><div class="muted">Exited</div><div class="stat">{{ stats.exited }}</div></div>
+<div class="card"><div class="muted">Materials pending check</div><div class="stat">{{ stats.materials_pending }}</div></div>
+</div>
+<div class="card"><h3>Recent gate passes</h3>
+<table><tr><th>Pass No</th><th>Visitor</th><th>Company</th><th>Dept</th><th>Valid until</th><th>Status</th></tr>
+{% for p in passes %}<tr><td><a href="{{ url_for('passes.view_pass', pass_no=p.pass_no) }}">{{ p.pass_no }}</a></td>
+<td>{{ p.visitor_name }}</td><td>{{ p.company or '-' }}</td><td>{{ p.department }}</td>
+<td>{{ p.valid_until.strftime('%d %b %H:%M') }}</td><td><span class="badge {{ p.status }}">{{ p.status }}{% if p.status=='issued' and p.is_expired %} (expired){% endif %}</span></td></tr>
+{% else %}<tr><td colspan="6" class="muted">No passes yet</td></tr>{% endfor %}</table>
+{% if g.user.role == 'admin' %}<p><a class="btn secondary" href="{{ url_for('admin.export_csv') }}">Export CSV</a></p>{% endif %}</div>
+{% endblock %}

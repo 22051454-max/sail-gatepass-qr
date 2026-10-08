@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% block content %}
+<form method="post" class="card"><h2>Issue gate pass</h2>
+<div class="grid">
+<div><label>Visitor name *</label><input name="visitor_name" value="{{ form.get('visitor_name','') }}" required></div>
+<div><label>Phone</label><input name="visitor_phone" value="{{ form.get('visitor_phone','') }}"></div>
+<div><label>ID proof</label><input name="id_proof" placeholder="e.g. DL / Aadhaar (last 4)"></div>
+<div><label>Company</label><input name="company"></div>
+<div><label>Department to visit *</label><select name="department" required>
+{% for d in ['Mechanical','Electrical','Stores','HR','Blast Furnace','Safety','Finance'] %}<option>{{ d }}</option>{% endfor %}</select></div>
+<div><label>Vehicle no</label><input name="vehicle_no"></div>
+<div><label>Gate</label><select name="gate"><option>Main Gate</option><option>Gate 2 (Material)</option><option>Gate 3</option></select></div>
+<div><label>Validity (hours)</label><input name="validity_hours" type="number" min="1" max="72" value="12"></div>
+</div>
+<label>Purpose *</label><input name="purpose" required>
+<h3>Material entries</h3>
+<table id="mats"><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Direction</th><th>Returnable</th></tr></table>
+<p class="noprint"><button type="button" class="btn secondary" onclick="addRow()">+ Add material</button></p>
+<p><button class="btn">Generate pass</button></p></form>
+<script>
+let n=0;function addRow(){const t=document.getElementById('mats');const r=t.insertRow();const i=n++;
+r.innerHTML=`<td><input name="mat_desc"></td><td><input name="mat_qty" type="number" step="any" value="1"></td>
+<td><input name="mat_unit" value="nos"></td><td><select name="mat_dir"><option value="in">In</option><option value="out">Out</option></select></td>
+<td><input type="checkbox" name="mat_ret" value="${i}" style="width:auto"></td>`;}
+addRow();
+</script>
+{% endblock %}
