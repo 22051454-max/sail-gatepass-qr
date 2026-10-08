@@ -63,3 +63,7 @@ app/
   templates/    Jinja2 pages
 tests/          pytest suite
 ```
+
+## Author and contributors
+
+- **Sandeep Kashyap** ([@sktut](https://github.com/sktut)), author and maintainer
